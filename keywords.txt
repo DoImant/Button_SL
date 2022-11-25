@@ -1,0 +1,31 @@
+#######################################
+# Syntax Coloring Map for Button
+#######################################
+
+#######################################
+# Datatypes (KEYWORD1)
+#######################################
+
+Btn	KEYWORD1
+Button	KEYWORD1
+ButtonLS	KEYWORD1
+
+#######################################
+# Methods and Functions (KEYWORD2)
+#######################################
+
+begin	KEYWORD2
+tick	KEYWORD2
+releaseOn	KEYWORD2
+releaseOff	KEYWORD2
+setDebounceTime_ms	KEYWORD2
+setThreshold_ms	KEYWORD2
+getDuration_ms	KEYWORD2
+
+#######################################
+# Constants (LITERAL1)
+#######################################
+ButtonState	LITERAL1
+notPressed	LITERAL1
+shortPressed	LITERAL1
+longPressed	LITERAL1
