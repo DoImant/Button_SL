@@ -20,6 +20,8 @@ Therefore the active state is HIGH:
 Initialize the object and set the debounce time to 20ms (default is 30ms):
 
 ```C++
+#include <Button_SL.hpp>
+
 using namespace Btn;
 Button btn{2,HIGH};
 
@@ -46,6 +48,8 @@ For >= 1500ms Buttonstate::longPressed will be returned. The time is stored in a
 and must not exceed 65535 ms.  
 
 ```C++
+#include <Button_SL.hpp>
+
 using namespace Btn;
 ButtonSL btnSL{2,1500,HIGH};
 
