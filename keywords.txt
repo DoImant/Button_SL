@@ -8,7 +8,7 @@
 
 Btn	KEYWORD1
 Button	KEYWORD1
-ButtonLS	KEYWORD1
+ButtonSL	KEYWORD1
 
 #######################################
 # Methods and Functions (KEYWORD2)
