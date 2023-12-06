@@ -21,6 +21,9 @@
 /// @version 1.1.0        The ButtonSL class can now provide a status after the specified time period 
 ///                       for a long button press, even if the button remains permanently pressed.
 ///
+/// @date 2023-12-06
+/// @version 1.1.4        Repeated debounce in the button class removed.
+///
 /// @copyright Copyright (c) 2022
 /// MIT license, check license.md for more information
 /// All text above must be included in any redistribution
@@ -54,12 +57,12 @@ bool Button::tick() {
         [[fallthrough]];
       case HIGH:
         if (millis() - timeStamp > dbTime_ms) {
-          compareState = LOW;   // If the button press is equal to the specified debounce time,
-          flag = true;          // confirm the button press with true.
+          // If the button press is equal to the specified debounce time, confirm the button press with true.
+          flag = true;            
         }
         break;
     }
-  } else if (compareState) {
+  } else if (compareState == true) {
     compareState = LOW;   // set to LOW if button is no longer pressed
   }
   return flag;
