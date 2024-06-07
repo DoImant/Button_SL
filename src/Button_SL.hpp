@@ -66,15 +66,15 @@ public:
   ButtonSL(uint8_t pinNr = 0, uint16_t t_ms = 1000, bool as = LOW) : Button{pinNr, as} { time_ms = t_ms; }
   ButtonState tick();
   void setTimeThreshold_ms(uint16_t);
-  void releaseOn() { release = true; }
-  void releaseOff() { release = false; }
+  void releaseOn() { autoRelease = true; }
+  void releaseOff() { autoRelease = false; }
   uint32_t getDuration_ms() const;
 
 private:
   uint16_t time_ms;   // Saves the time (in ms) from which a key press is recognized as long.
   uint8_t state{!activeState};
   uint16_t pressingTime;   // Saves the length of time that the button was pressed (ms).
-  bool release{false};
+  bool autoRelease{false};
   bool hasReleased{false};
 };
 }   // namespace Btn

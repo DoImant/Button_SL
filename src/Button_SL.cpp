@@ -18,11 +18,16 @@
 /// @version 1.0.1        change CAPS Enums
 ///
 /// @date 2022-14-11
-/// @version 1.1.0        The ButtonSL class can now provide a status after the specified time period 
+/// @version 1.1.0        The ButtonSL class can now provide a status after the specified time period
 ///                       for a long button press, even if the button remains permanently pressed.
 ///
 /// @date 2023-12-06
 /// @version 1.1.4        Repeated debounce in the button class removed.
+///
+/// @date 2024-07-06
+/// @version 1.1.5        The autorelease is only executed once as long as the button has not been released. 
+///                       Previously, if the button was held down continuously, the autorelease was executed 
+///                       every time the time for a long button press expired. 
 ///
 /// @copyright Copyright (c) 2022
 /// MIT license, check license.md for more information
@@ -58,7 +63,7 @@ bool Button::tick() {
       case HIGH:
         if (millis() - timeStamp > dbTime_ms) {
           // If the button press is equal to the specified debounce time, confirm the button press with true.
-          flag = true;            
+          flag = true;
         }
         break;
     }
@@ -87,15 +92,16 @@ ButtonState ButtonSL::tick() {
   state = digitalRead(pin);
   if (state == activeState && compareState != activeState) {
     timeStamp = now;
+    hasReleased = false;
   } else if (state != activeState && compareState == activeState) {
     timeStamp = now - timeStamp;
     if (timeStamp >= dbTime_ms && !hasReleased) {   // released after debounce time?
       return (timeStamp >= time_ms) ? ButtonState::longPressed : ButtonState::shortPressed;
     }
-    hasReleased = false;
-  } else if (release && (compareState == activeState)) {
+    // hasReleased = false;
+  } else if (autoRelease && not hasReleased && (compareState == activeState)) {
     if (now - timeStamp >= time_ms) {
-      state = !compareState;
+      // state = !compareState;
       hasReleased = true;
       timeStamp = time_ms;
       return ButtonState::longPressed;
