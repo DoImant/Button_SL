@@ -105,12 +105,12 @@ You can test this library with the online simulator wokwi:: [Button Example](htt
 
 ## Notes
 
-Version 1.1.6:
-The ButtonState::pressed status has been added.
+Version 1.1.6:  
+The ButtonState::pressed status has been added.  
 For a long button press with automatic release enabled, the ButtonState::longPressed status is returned once
 when the defined time for a long button press is reached and then the ButtonState::pressed status is returned
-as long as the button is held down.  Previously (version 1.1.6), ButtonState::nopressed was returned even
-if the button had not yet been released.
+as long as the button is held down.  
+Previously (version 1.1.5), ButtonState::nopressed was returned even if the button had not yet been released.
 
 ## Methods
 
