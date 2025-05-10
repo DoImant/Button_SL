@@ -107,7 +107,7 @@ ButtonState ButtonSL::tick() {
       return ButtonState::longPressed;
     }
   }
-  return ButtonState::notPressed;
+  return hasReleased ? ButtonState::pressed : ButtonState::notPressed;
 }
 
 //////////////////////////////////////////////////////////////////////////////

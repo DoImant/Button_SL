@@ -30,7 +30,7 @@ constexpr uint8_t DEBOUNCE_TIME{30};   // The value can be reduced for buttons t
 //////////////////////////////////////////////////
 // Variables and Classdefinitions
 //////////////////////////////////////////////////
-enum class ButtonState : uint8_t { notPressed, shortPressed, longPressed };
+enum class ButtonState : uint8_t { notPressed = false, pressed = true, shortPressed = 2, longPressed };
 
 //////////////////////////////////////////////////////////////////////////////
 /// @brief Button object

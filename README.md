@@ -9,7 +9,7 @@ be pressed for at least 0.5 seconds).
 
 ButtonSL is extended so that a distinction can be made between a short and long button press.
 A time (in ms) can be specified after which a button press is considered "long".
-Correspondingly, the tick() method returns the status notPressed, shortPressed or longPressed.
+Correspondingly, the tick() method returns the status notPressed, shortPressed or longPressed/pressed.
 
 ## Examples
 
@@ -102,6 +102,15 @@ You can test this library with the online simulator wokwi:: [Button Example](htt
 * Time limit for the distinction between short and long button presses: 1000ms (max. 65535 ms).
 * Debounce time: 30ms (max. 65535 ms).
 * For ButtonSL releaseOff()
+
+## Notes
+
+Version 1.1.6:
+The ButtonState::pressed status has been added.
+For a long button press with automatic release enabled, the ButtonState::longPressed status is returned once
+when the defined time for a long button press is reached and then the ButtonState::pressed status is returned
+as long as the button is held down.  Previously (version 1.1.6), ButtonState::nopressed was returned even
+if the button had not yet been released.
 
 ## Methods
 
