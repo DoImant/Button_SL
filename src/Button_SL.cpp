@@ -25,9 +25,18 @@
 /// @version 1.1.4        Repeated debounce in the button class removed.
 ///
 /// @date 2024-07-06
-/// @version 1.1.5        The autorelease is only executed once as long as the button has not been released. 
-///                       Previously, if the button was held down continuously, the autorelease was executed 
-///                       every time the time for a long button press expired. 
+/// @version 1.1.5        The autorelease is only executed once as long as the button has not been released.
+///                       Previously, if the button was held down continuously, the autorelease was executed
+///                       every time the time for a long button press expired.
+///
+/// @date 2025-05-10
+/// @version 1.1.6        The ButtonState::pressed status has been added.
+///                       For a long button press with automatic release enabled, the ButtonState::longPressed status 
+///                       is returned once when the defined time for a long button press is reached. Then 
+///                       the ButtonState::pressed status is returned as long as the button is held down.
+///
+/// @date 2025-05-26
+/// @version 1.1.7        tick() Method code rework. Bug fix.
 ///
 /// @copyright Copyright (c) 2022
 /// MIT license, check license.md for more information
@@ -58,10 +67,10 @@ bool Button::tick() {
     switch (compareState) {
       case LOW:
         compareState = HIGH;   // set to HIGH when Button was pressed
-        timeStamp = millis();
+        timestamp = millis();
         [[fallthrough]];
       case HIGH:
-        if (millis() - timeStamp > dbTime_ms) {
+        if (millis() - timestamp > dbTime_ms) {
           // If the button press is equal to the specified debounce time, confirm the button press with true.
           flag = true;
         }
@@ -84,30 +93,50 @@ void Button::setDebounceTime_ms(uint16_t dbT_ms) { dbTime_ms = dbT_ms; }
 /// @brief The ButtonSL query. The tick() method should be called in an endless loop.
 ///
 /// @param time_ms        time (in ms) from which a key press is recognized as long
-/// @return ButtonState   The states are "Not pressed", "short pressed" and "long pressed"
+/// @return ButtonState   The states are "not pressed", "pressed", "short pressed" and "long pressed"
 //////////////////////////////////////////////////////////////////////////////
+
 ButtonState ButtonSL::tick() {
-  uint_least32_t now = millis();
   compareState = state;
   state = digitalRead(pin);
-  if (state == activeState && compareState != activeState) {
-    timeStamp = now;
-    hasReleased = false;
-  } else if (state != activeState && compareState == activeState) {
-    timeStamp = now - timeStamp;
-    if (timeStamp >= dbTime_ms && !hasReleased) {   // released after debounce time?
-      return (timeStamp >= time_ms) ? ButtonState::longPressed : ButtonState::shortPressed;
-    }
-    // hasReleased = false;
-  } else if (autoRelease && not hasReleased && (compareState == activeState)) {
-    if (now - timeStamp >= time_ms) {
-      // state = !compareState;
-      hasReleased = true;
-      timeStamp = time_ms;
-      return ButtonState::longPressed;
-    }
+  
+  MillisType now = millis();
+  if (state != activeState && compareState != activeState) {          // not pressed
+    return ButtonState::notPressed;
+  } else if (state == activeState && compareState != activeState) {   // Not pressed to pressed
+    timestamp = now;
+    autoReleaseFired = false;
+    pin_state = Condition::notPressedToPressed;
+  } else if (state == activeState && compareState == activeState) {   // pressed
+    pin_state = Condition::pressed;
+  } else if (state != activeState && compareState == activeState) {   //  Pressed to not pressed
+    pin_state = Condition::pressedToNotpressed;
+  } 
+
+  switch (pin_state) {
+    case Condition::notPressedToPressed:
+    case Condition::pressed:
+      if (autoRelease) {
+        switch (autoReleaseFired) {
+          case true: return ButtonState::pressed; break;
+          case false:
+            if (now - timestamp >= time_ms) {
+              autoReleaseFired = true;
+              timestamp = time_ms;
+              return ButtonState::longPressed;
+            }
+        }
+      }
+      break;
+    case Condition::pressedToNotpressed:
+      timestamp = now - timestamp;
+      // Push duration longer than the debounce time?
+      if (timestamp >= dbTime_ms && !autoReleaseFired) {
+        return (timestamp >= time_ms) ? ButtonState::longPressed : ButtonState::shortPressed;
+      }
+      break;
   }
-  return hasReleased ? ButtonState::pressed : ButtonState::notPressed;
+  return ButtonState::notPressed;
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -122,5 +151,5 @@ void ButtonSL::setTimeThreshold_ms(uint16_t th_ms) { time_ms = th_ms; }
 ///
 /// @return uint32_t Time in milliseconds
 //////////////////////////////////////////////////////////////////////////////
-uint32_t ButtonSL::getDuration_ms(void) const { return timeStamp; }
+uint32_t ButtonSL::getDuration_ms(void) const { return timestamp; }
 }   // namespace Btn

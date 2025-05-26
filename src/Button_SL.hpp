@@ -17,15 +17,21 @@
 /// All text above must be included in any redistribution
 //////////////////////////////////////////////////////////////////////////////
 
-#ifndef _BUTTON_SL_HPP_
-#define _BUTTON_SL_HPP_
+#pragma once
+
 #include <Arduino.h>
 
 namespace Btn {
+
+//////////////////////////////////////////////////
+// Type alias(es)
+//////////////////////////////////////////////////
+using MillisType = decltype(millis());
+
 //////////////////////////////////////////////////
 // Constants
 //////////////////////////////////////////////////
-constexpr uint8_t DEBOUNCE_TIME{30};   // The value can be reduced for buttons that bounce little. Time in ms.
+constexpr uint8_t DEBOUNCE_TIME {30};   // The value can be reduced for buttons that bounce little. Time in ms.
 
 //////////////////////////////////////////////////
 // Variables and Classdefinitions
@@ -40,10 +46,10 @@ enum class ButtonState : uint8_t { notPressed = false, pressed = true, shortPres
 //////////////////////////////////////////////////////////////////////////////
 class Button {
 public:
-  Button(uint8_t pinNr = 0, bool as = LOW) : pin{pinNr}, activeState{as} {}
-  Button(const Button &) = delete;              // No copy constructor
-  Button &operator=(const Button &) = delete;   // No assignment
-  Button(Button &&) = default;                  // Move it
+  Button(uint8_t pinNr = 0, bool as = LOW) : pin {pinNr}, activeState {as} {}
+  Button(const Button&) = delete;              // No copy constructor
+  Button& operator=(const Button&) = delete;   // No assignment
+  Button(Button&&) = default;                  // Move it
   void begin();
   bool tick();
   void setDebounceTime_ms(uint16_t);
@@ -51,9 +57,9 @@ public:
 protected:
   uint8_t pin;           // Button PIN number
   uint8_t activeState;   // Saves whether the buttons active state is HIGH or LOW.
-  uint8_t compareState{LOW};
-  uint16_t dbTime_ms{DEBOUNCE_TIME};
-  uint_least32_t timeStamp;
+  uint8_t compareState {LOW};
+  uint16_t dbTime_ms {DEBOUNCE_TIME};
+  MillisType timestamp;
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -63,7 +69,7 @@ protected:
 //////////////////////////////////////////////////////////////////////////////
 class ButtonSL : public Button {
 public:
-  ButtonSL(uint8_t pinNr = 0, uint16_t t_ms = 1000, bool as = LOW) : Button{pinNr, as} { time_ms = t_ms; }
+  ButtonSL(uint8_t pinNr = 0, uint16_t t_ms = 1000, bool as = LOW) : Button {pinNr, as} { time_ms = t_ms; }
   ButtonState tick();
   void setTimeThreshold_ms(uint16_t);
   void releaseOn() { autoRelease = true; }
@@ -71,11 +77,11 @@ public:
   uint32_t getDuration_ms() const;
 
 private:
-  uint16_t time_ms;   // Saves the time (in ms) from which a key press is recognized as long.
-  uint8_t state{!activeState};
-  uint16_t pressingTime;   // Saves the length of time that the button was pressed (ms).
-  bool autoRelease{false};
-  bool hasReleased{false};
+  uint16_t time_ms;        // Saves the time (in ms) from which a key press is recognized as long.
+  uint8_t state {!activeState};
+  bool autoRelease {false};
+  bool autoReleaseFired {false};
+  enum class Condition : byte { notPressedToPressed, pressed, pressedToNotpressed };
+  Condition pin_state {Condition::pressedToNotpressed};
 };
 }   // namespace Btn
-#endif
